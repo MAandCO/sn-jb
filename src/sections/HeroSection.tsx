@@ -2,6 +2,7 @@ import { useEffect, useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight, Calendar, Globe, Shield } from 'lucide-react';
+import { useReducedMotion } from '../hooks/use-reduced-motion';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -19,9 +20,11 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
   const statsRef = useRef<HTMLDivElement>(null);
   const livePillRef = useRef<HTMLDivElement>(null);
   const curtainRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   // Auto-play entrance animation on load
   useEffect(() => {
+    if (prefersReducedMotion) return;
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
 
@@ -96,10 +99,11 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
 
   // Scroll-driven exit animation
   useLayoutEffect(() => {
+    if (prefersReducedMotion) return;
     const section = sectionRef.current;
     if (!section) return;
 
@@ -136,12 +140,23 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
     }, section);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
 
   const scrollToServices = () => {
     const element = document.getElementById('services');
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      element.scrollIntoView({
+        behavior: prefersReducedMotion ? 'auto' : 'smooth',
+      });
+    }
+  };
+
+  const scrollToContact = () => {
+    const element = document.getElementById('contact');
+    if (element) {
+      element.scrollIntoView({
+        behavior: prefersReducedMotion ? 'auto' : 'smooth',
+      });
     }
   };
 
@@ -154,7 +169,9 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
       {/* Navy curtain for entrance */}
       <div
         ref={curtainRef}
-        className="absolute inset-0 bg-[#0B1C2F] z-50"
+        className={`absolute inset-0 bg-[#0B1C2F] z-50 ${
+          prefersReducedMotion ? 'hidden' : ''
+        }`}
         style={{ transformOrigin: 'right' }}
       />
 
@@ -194,19 +211,25 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
 
               <p
                 ref={subheadlineRef}
-                className="text-sm lg:text-base text-[#6B7A8C] max-w-[28vw] leading-relaxed mb-6 lg:mb-8"
+                className="text-sm lg:text-base text-[#6B7A8C] max-w-full lg:max-w-[28vw] leading-relaxed mb-6 lg:mb-8"
               >
                 MA & Co is a UK-founded, digital-first accountancy and advisory
-                firm—now supporting clients in Malaysia and Singapore.
+                firm with fixed monthly packages, unlimited support, and teams
+                serving clients in the UK, Malaysia, and Singapore.
               </p>
 
               <div ref={ctaRef} className="flex flex-wrap gap-3">
-                <button className="flex items-center gap-2 px-5 py-2.5 bg-[#1E63AF] text-white text-sm font-medium rounded-lg hover:bg-[#1854a0] transition-colors">
+                <button
+                  type="button"
+                  onClick={scrollToContact}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-[#1E63AF] text-white text-sm font-medium rounded-lg hover:bg-[#1854a0] transition-colors"
+                >
                   <Calendar className="w-4 h-4" />
-                  Book a discovery call
+                  Book a consultation
                 </button>
                 <button
                   onClick={scrollToServices}
+                  type="button"
                   className="flex items-center gap-2 px-5 py-2.5 border border-[rgba(11,28,47,0.15)] text-[#0B1C2F] text-sm font-medium rounded-lg hover:bg-[#0B1C2F] hover:text-white transition-all"
                 >
                   Explore services
@@ -224,20 +247,20 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
                 <div className="flex items-center gap-2 mb-1">
                   <Globe className="w-4 h-4 text-[#1E63AF]" />
                   <span className="font-mono text-xl lg:text-2xl font-bold text-[#0B1C2F]">
-                    1,400+
+                    UK-wide
                   </span>
                 </div>
-                <span className="text-xs text-[#6B7A8C]">Clients served</span>
+                <span className="text-xs text-[#6B7A8C]">Remote + mobile support</span>
               </div>
 
               <div className="stat-tile p-3 lg:p-4 bg-[#F6F8FB] rounded-xl hairline-border">
                 <div className="flex items-center gap-2 mb-1">
                   <Shield className="w-4 h-4 text-[#10B981]" />
                   <span className="font-mono text-xl lg:text-2xl font-bold text-[#0B1C2F]">
-                    3
+                    Licensed
                   </span>
                 </div>
-                <span className="text-xs text-[#6B7A8C]">Jurisdictions</span>
+                <span className="text-xs text-[#6B7A8C]">Qualified accountants</span>
               </div>
 
               <div className="stat-tile p-3 lg:p-4 bg-[#F6F8FB] rounded-xl hairline-border">
@@ -246,10 +269,10 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
                     <span className="w-1.5 h-1.5 bg-white rounded-full" />
                   </span>
                   <span className="font-mono text-xl lg:text-2xl font-bold text-[#0B1C2F]">
-                    99.2%
+                    Unlimited
                   </span>
                 </div>
-                <span className="text-xs text-[#6B7A8C]">On-time filing</span>
+                <span className="text-xs text-[#6B7A8C]">Phone + email support</span>
               </div>
             </div>
           </div>

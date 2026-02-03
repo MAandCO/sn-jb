@@ -2,6 +2,7 @@ import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { FileText, Calculator, Receipt, Lightbulb } from 'lucide-react';
+import { useReducedMotion } from '../hooks/use-reduced-motion';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -15,8 +16,10 @@ export default function UKSection({ className = '' }: UKSectionProps) {
   const contentRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const tilesRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   useLayoutEffect(() => {
+    if (prefersReducedMotion) return;
     const section = sectionRef.current;
     if (!section) return;
 
@@ -85,7 +88,7 @@ export default function UKSection({ className = '' }: UKSectionProps) {
     }, section);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
 
   const features = [
     { icon: FileText, label: 'Year-end accounts' },
@@ -106,11 +109,15 @@ export default function UKSection({ className = '' }: UKSectionProps) {
         className="absolute left-[6vw] top-[16vh] w-[88vw] lg:w-[30vw] h-[30vh] lg:h-[68vh] will-change-transform"
       >
         <div className="w-full h-full bg-white rounded-[18px] card-shadow hairline-border overflow-hidden">
-          <img
-            src="/uk_meeting.jpg"
-            alt="UK business meeting"
-            className="w-full h-full object-cover"
-          />
+            <img
+              src="/uk_meeting.jpg"
+              alt="UK business meeting"
+              loading="lazy"
+              decoding="async"
+              width={900}
+              height={1200}
+              className="w-full h-full object-cover"
+            />
         </div>
       </div>
 
@@ -154,7 +161,7 @@ export default function UKSection({ className = '' }: UKSectionProps) {
               <span className="word inline-block">Tax</span>
             </h2>
 
-            <p className="text-sm lg:text-base text-[#6B7A8C] leading-relaxed max-w-[34vw] mb-6 lg:mb-8">
+            <p className="text-sm lg:text-base text-[#6B7A8C] leading-relaxed max-w-full lg:max-w-[34vw] mb-6 lg:mb-8">
               Statutory accounts, corporation tax, VAT, payroll, and
               self-assessment—delivered with clear timelines and proactive
               reminders.

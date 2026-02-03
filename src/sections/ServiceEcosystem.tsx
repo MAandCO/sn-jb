@@ -2,6 +2,7 @@ import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight, Building2, MapPin, Landmark } from 'lucide-react';
+import { useReducedMotion } from '../hooks/use-reduced-motion';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -15,8 +16,10 @@ export default function ServiceEcosystem({ className = '' }: ServiceEcosystemPro
   const card1Ref = useRef<HTMLDivElement>(null);
   const card2Ref = useRef<HTMLDivElement>(null);
   const card3Ref = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   useLayoutEffect(() => {
+    if (prefersReducedMotion) return;
     const section = sectionRef.current;
     if (!section) return;
 
@@ -79,19 +82,21 @@ export default function ServiceEcosystem({ className = '' }: ServiceEcosystemPro
     }, section);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      element.scrollIntoView({
+        behavior: prefersReducedMotion ? 'auto' : 'smooth',
+      });
     }
   };
 
   return (
     <section
       ref={sectionRef}
-      id="services"
+      id="service-ecosystem"
       className={`section-pinned dot-grid ${className}`}
     >
       {/* Left headline block */}
@@ -110,10 +115,12 @@ export default function ServiceEcosystem({ className = '' }: ServiceEcosystemPro
       {/* Service cards container */}
       <div className="absolute left-[6vw] lg:left-[36vw] top-[38vh] lg:top-[16vh] w-[88vw] lg:w-[58vw] h-auto lg:h-[68vh]">
         {/* Card 1 - UK (top, full width) */}
-        <div
+        <button
           ref={card1Ref}
           onClick={() => scrollToSection('uk')}
-          className="w-full h-auto lg:h-[20vh] bg-white rounded-[18px] card-shadow hairline-border p-5 lg:p-6 mb-4 cursor-pointer hover:shadow-lg transition-shadow will-change-transform group"
+          type="button"
+          aria-label="Explore UK Accounting & Tax"
+          className="w-full text-left h-auto lg:h-[20vh] bg-white rounded-[18px] card-shadow hairline-border p-5 lg:p-6 mb-4 cursor-pointer hover:shadow-lg transition-shadow will-change-transform group"
         >
           <div className="flex items-start justify-between h-full">
             <div className="flex flex-col justify-between h-full">
@@ -138,15 +145,17 @@ export default function ServiceEcosystem({ className = '' }: ServiceEcosystemPro
               Explore <ArrowRight className="w-4 h-4" />
             </span>
           </div>
-        </div>
+        </button>
 
         {/* Bottom row cards */}
         <div className="flex flex-col lg:flex-row gap-4">
           {/* Card 2 - Malaysia */}
-          <div
+          <button
             ref={card2Ref}
             onClick={() => scrollToSection('malaysia')}
-            className="w-full lg:w-[48%] h-auto lg:h-[44vh] bg-white rounded-[18px] card-shadow hairline-border p-5 lg:p-6 cursor-pointer hover:shadow-lg transition-shadow will-change-transform group"
+            type="button"
+            aria-label="Explore Malaysia Market Entry"
+            className="w-full text-left lg:w-[48%] h-auto lg:h-[44vh] bg-white rounded-[18px] card-shadow hairline-border p-5 lg:p-6 cursor-pointer hover:shadow-lg transition-shadow will-change-transform group"
           >
             <div className="flex flex-col h-full justify-between">
               <div>
@@ -169,13 +178,15 @@ export default function ServiceEcosystem({ className = '' }: ServiceEcosystemPro
                 Explore <ArrowRight className="w-4 h-4" />
               </span>
             </div>
-          </div>
+          </button>
 
           {/* Card 3 - Singapore */}
-          <div
+          <button
             ref={card3Ref}
             onClick={() => scrollToSection('singapore')}
-            className="w-full lg:w-[48%] h-auto lg:h-[44vh] bg-white rounded-[18px] card-shadow hairline-border p-5 lg:p-6 cursor-pointer hover:shadow-lg transition-shadow will-change-transform group"
+            type="button"
+            aria-label="Explore Singapore Corporate Advisory"
+            className="w-full text-left lg:w-[48%] h-auto lg:h-[44vh] bg-white rounded-[18px] card-shadow hairline-border p-5 lg:p-6 cursor-pointer hover:shadow-lg transition-shadow will-change-transform group"
           >
             <div className="flex flex-col h-full justify-between">
               <div>
@@ -198,7 +209,7 @@ export default function ServiceEcosystem({ className = '' }: ServiceEcosystemPro
                 Explore <ArrowRight className="w-4 h-4" />
               </span>
             </div>
-          </div>
+          </button>
         </div>
       </div>
     </section>

@@ -2,6 +2,7 @@ import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Building2, TrendingUp, FileSignature, Handshake } from 'lucide-react';
+import { useReducedMotion } from '../hooks/use-reduced-motion';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,8 +15,10 @@ export default function CrossBorderSection({ className = '' }: CrossBorderSectio
   const contentRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
   const tilesRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   useLayoutEffect(() => {
+    if (prefersReducedMotion) return;
     const section = sectionRef.current;
     if (!section) return;
 
@@ -74,7 +77,7 @@ export default function CrossBorderSection({ className = '' }: CrossBorderSectio
     }, section);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
 
   const features = [
     { icon: Building2, label: 'Holdco setup' },
@@ -115,7 +118,7 @@ export default function CrossBorderSection({ className = '' }: CrossBorderSectio
               Cross-Border Structuring
             </h2>
 
-            <p className="text-sm lg:text-base text-[#6B7A8C] leading-relaxed max-w-[34vw] mb-6 lg:mb-8">
+            <p className="text-sm lg:text-base text-[#6B7A8C] leading-relaxed max-w-full lg:max-w-[34vw] mb-6 lg:mb-8">
               Holdco structures, transfer pricing documentation, and intercompany
               agreements—aligned to UK, Malaysia, and Singapore rules.
             </p>
@@ -150,6 +153,10 @@ export default function CrossBorderSection({ className = '' }: CrossBorderSectio
           <img
             src="/crossborder_handshake.jpg"
             alt="Cross-border partnership"
+            loading="lazy"
+            decoding="async"
+            width={900}
+            height={1200}
             className="w-full h-full object-cover"
           />
         </div>

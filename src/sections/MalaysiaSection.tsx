@@ -2,6 +2,7 @@ import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Building, FileCheck, ClipboardCheck, Globe } from 'lucide-react';
+import { useReducedMotion } from '../hooks/use-reduced-motion';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,8 +15,10 @@ export default function MalaysiaSection({ className = '' }: MalaysiaSectionProps
   const contentRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
   const tilesRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   useLayoutEffect(() => {
+    if (prefersReducedMotion) return;
     const section = sectionRef.current;
     if (!section) return;
 
@@ -74,7 +77,7 @@ export default function MalaysiaSection({ className = '' }: MalaysiaSectionProps
     }, section);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
 
   const features = [
     { icon: Building, label: 'Incorporation' },
@@ -112,7 +115,7 @@ export default function MalaysiaSection({ className = '' }: MalaysiaSectionProps
               Malaysia Market Entry
             </h2>
 
-            <p className="text-sm lg:text-base text-[#6B7A8C] leading-relaxed max-w-[34vw] mb-6 lg:mb-8">
+            <p className="text-sm lg:text-base text-[#6B7A8C] leading-relaxed max-w-full lg:max-w-[34vw] mb-6 lg:mb-8">
               Incorporation, tax registration, and ongoing compliance—so you can
               hire, invoice, and operate without delays.
             </p>
@@ -147,6 +150,10 @@ export default function MalaysiaSection({ className = '' }: MalaysiaSectionProps
           <img
             src="/malaysia_city.jpg"
             alt="Kuala Lumpur skyline"
+            loading="lazy"
+            decoding="async"
+            width={900}
+            height={1200}
             className="w-full h-full object-cover"
           />
         </div>

@@ -1,7 +1,8 @@
-import { useRef, useLayoutEffect, useEffect, useState } from 'react';
+import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Link2, Search, CheckCircle, Quote } from 'lucide-react';
+import { Link2, Search, CheckCircle, Shield } from 'lucide-react';
+import { useReducedMotion } from '../hooks/use-reduced-motion';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -9,60 +10,17 @@ interface ComplianceSectionProps {
   className?: string;
 }
 
-interface CounterProps {
-  end: number;
-  suffix?: string;
-  prefix?: string;
-}
-
-function Counter({ end, suffix = '', prefix = '' }: CounterProps) {
-  const [count, setCount] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
-
-  useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-
-    const trigger = ScrollTrigger.create({
-      trigger: element,
-      start: 'top 80%',
-      onEnter: () => {
-        gsap.to(
-          { value: 0 },
-          {
-            value: end,
-            duration: 0.8,
-            ease: 'power2.out',
-            onUpdate: function () {
-              setCount(Math.round(this.targets()[0].value));
-            },
-          }
-        );
-      },
-      once: true,
-    });
-
-    return () => trigger.kill();
-  }, [end]);
-
-  return (
-    <span ref={ref} className="font-mono">
-      {prefix}
-      {count}
-      {suffix}
-    </span>
-  );
-}
-
 export default function ComplianceSection({ className = '' }: ComplianceSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
   const workflowRef = useRef<HTMLDivElement>(null);
-  const testimonialsRef = useRef<HTMLDivElement>(null);
-  const metricsRef = useRef<HTMLDivElement>(null);
+  const standardsRef = useRef<HTMLDivElement>(null);
+  const promiseRef = useRef<HTMLDivElement>(null);
   const lineRef = useRef<SVGPathElement>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   useLayoutEffect(() => {
+    if (prefersReducedMotion) return;
     const section = sectionRef.current;
     if (!section) return;
 
@@ -126,9 +84,9 @@ export default function ComplianceSection({ className = '' }: ComplianceSectionP
         });
       }
 
-      // Testimonials
-      if (testimonialsRef.current) {
-        const cards = testimonialsRef.current.querySelectorAll('.testimonial-card');
+      // Standards
+      if (standardsRef.current) {
+        const cards = standardsRef.current.querySelectorAll('.standard-card');
         gsap.fromTo(
           cards,
           { y: 24, opacity: 0 },
@@ -139,7 +97,7 @@ export default function ComplianceSection({ className = '' }: ComplianceSectionP
             duration: 0.5,
             ease: 'power2.out',
             scrollTrigger: {
-              trigger: testimonialsRef.current,
+              trigger: standardsRef.current,
               start: 'top 75%',
               toggleActions: 'play none none reverse',
             },
@@ -147,10 +105,10 @@ export default function ComplianceSection({ className = '' }: ComplianceSectionP
         );
       }
 
-      // Metrics
-      if (metricsRef.current) {
+      // Promises
+      if (promiseRef.current) {
         gsap.fromTo(
-          metricsRef.current,
+          promiseRef.current,
           { y: 20, opacity: 0 },
           {
             y: 0,
@@ -158,7 +116,7 @@ export default function ComplianceSection({ className = '' }: ComplianceSectionP
             duration: 0.5,
             ease: 'power2.out',
             scrollTrigger: {
-              trigger: metricsRef.current,
+              trigger: promiseRef.current,
               start: 'top 80%',
               toggleActions: 'play none none reverse',
             },
@@ -168,7 +126,7 @@ export default function ComplianceSection({ className = '' }: ComplianceSectionP
     }, section);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
 
   const workflowSteps = [
     {
@@ -191,31 +149,31 @@ export default function ComplianceSection({ className = '' }: ComplianceSectionP
     },
   ];
 
-  const testimonials = [
+  const standards = [
     {
-      quote:
-        'They turned our year-end chaos into a calm, repeatable process.',
-      author: 'Finance Director',
-      company: 'SaaS',
+      title: 'Unlimited support',
+      description: 'Telephone and email support for day-to-day questions.',
     },
     {
-      quote:
-        'Malaysia setup was faster than we expected—without the usual back-and-forth.',
-      author: 'Founder',
-      company: 'Fintech',
+      title: 'Fixed-price packages',
+      description: 'Clear monthly fees with no hidden costs.',
     },
     {
-      quote: 'A true extension of our team across UK and Singapore.',
-      author: 'COO',
-      company: 'Fund',
+      title: 'Remote + mobile delivery',
+      description: 'Work with us remotely or on-site across the UK.',
     },
-  ];
-
-  const metrics = [
-    { value: 48, suffix: 'h', label: 'Average response' },
-    { value: 100, suffix: '%', label: 'Documentation standard' },
-    { value: 3, suffix: '', label: 'Jurisdictions' },
-    { value: 24, suffix: '/7', label: 'Dashboard access' },
+    {
+      title: 'Real-time insights',
+      description: 'Management accounts and reporting that stay up to date.',
+    },
+    {
+      title: 'HMRC compliance',
+      description: 'Deadlines, filings, and record-keeping handled end-to-end.',
+    },
+    {
+      title: 'Licensed & qualified team',
+      description: 'Experienced accountants with professional training.',
+    },
   ];
 
   return (
@@ -228,11 +186,11 @@ export default function ComplianceSection({ className = '' }: ComplianceSectionP
         {/* Heading */}
         <div ref={headingRef} className="text-center mb-12 lg:mb-16">
           <h2 className="text-[26px] sm:text-[32px] lg:text-[40px] font-bold text-[#0B1C2F] leading-[1.1] mb-4">
-            Built for compliance. Designed for speed.
+            Why businesses choose MA & Co
           </h2>
           <p className="text-sm lg:text-base text-[#6B7A8C] max-w-xl mx-auto">
-            Automated reminders, clear handoffs, and documentation that stays
-            audit-ready.
+            Clear timelines, proactive guidance, and accounting you can trust—delivered
+            by a licensed, qualified team.
           </p>
         </div>
 
@@ -271,46 +229,43 @@ export default function ComplianceSection({ className = '' }: ComplianceSectionP
           </div>
         </div>
 
-        {/* Testimonials */}
+        {/* Standards */}
         <div
-          ref={testimonialsRef}
+          ref={standardsRef}
           className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 mb-12 lg:mb-16"
         >
-          {testimonials.map((testimonial, index) => (
+          {standards.slice(0, 3).map((standard, index) => (
             <div
               key={index}
-              className="testimonial-card bg-white rounded-[18px] card-shadow-sm hairline-border p-6"
+              className="standard-card bg-white rounded-[18px] card-shadow-sm hairline-border p-6"
             >
-              <Quote className="w-6 h-6 text-[#1E63AF]/30 mb-3" />
-              <p className="text-sm text-[#0B1C2F] leading-relaxed mb-4">
-                "{testimonial.quote}"
+              <Shield className="w-6 h-6 text-[#1E63AF] mb-3" />
+              <h3 className="text-sm font-semibold text-[#0B1C2F] mb-2">
+                {standard.title}
+              </h3>
+              <p className="text-sm text-[#6B7A8C] leading-relaxed">
+                {standard.description}
               </p>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-[#0B1C2F]">
-                  {testimonial.author}
-                </span>
-                <span className="text-xs text-[#6B7A8C]">
-                  {testimonial.company}
-                </span>
-              </div>
             </div>
           ))}
         </div>
 
-        {/* Metrics */}
+        {/* Delivery promises */}
         <div
-          ref={metricsRef}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+          ref={promiseRef}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
         >
-          {metrics.map((metric, index) => (
+          {standards.slice(3).map((standard, index) => (
             <div
               key={index}
-              className="bg-white rounded-xl card-shadow-sm hairline-border p-4 text-center"
+              className="bg-white rounded-xl card-shadow-sm hairline-border p-5"
             >
-              <div className="text-2xl lg:text-3xl font-bold text-[#1E63AF] mb-1">
-                <Counter end={metric.value} suffix={metric.suffix} />
-              </div>
-              <span className="text-xs text-[#6B7A8C]">{metric.label}</span>
+              <h4 className="text-sm font-semibold text-[#0B1C2F] mb-2">
+                {standard.title}
+              </h4>
+              <p className="text-sm text-[#6B7A8C] leading-relaxed">
+                {standard.description}
+              </p>
             </div>
           ))}
         </div>

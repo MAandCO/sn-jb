@@ -1,7 +1,8 @@
 import { useRef, useLayoutEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Send, Mail, Phone } from 'lucide-react';
+import { Send, Mail, Phone, MessageCircle, MapPin, Clock } from 'lucide-react';
+import { useReducedMotion } from '../hooks/use-reduced-motion';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -13,6 +14,7 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
   const sectionRef = useRef<HTMLElement>(null);
   const headlineRef = useRef<HTMLDivElement>(null);
   const formCardRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -20,8 +22,10 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
     phone: '',
     message: '',
   });
+  const [submitted, setSubmitted] = useState(false);
 
   useLayoutEffect(() => {
+    if (prefersReducedMotion) return;
     const section = sectionRef.current;
     if (!section) return;
 
@@ -81,12 +85,11 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
     }, section);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    alert('Thank you for your inquiry. We will be in touch shortly.');
+    setSubmitted(true);
   };
 
   const handleChange = (
@@ -128,10 +131,14 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
           <form onSubmit={handleSubmit} className="h-full flex flex-col">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
               <div className="form-field">
-                <label className="block text-xs font-medium text-[#6B7A8C] uppercase tracking-wider mb-1.5">
+                <label
+                  htmlFor="contact-name"
+                  className="block text-xs font-medium text-[#6B7A8C] uppercase tracking-wider mb-1.5"
+                >
                   Name
                 </label>
                 <input
+                  id="contact-name"
                   type="text"
                   name="name"
                   value={formData.name}
@@ -143,10 +150,14 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
               </div>
 
               <div className="form-field">
-                <label className="block text-xs font-medium text-[#6B7A8C] uppercase tracking-wider mb-1.5">
+                <label
+                  htmlFor="contact-email"
+                  className="block text-xs font-medium text-[#6B7A8C] uppercase tracking-wider mb-1.5"
+                >
                   Email
                 </label>
                 <input
+                  id="contact-email"
                   type="email"
                   name="email"
                   value={formData.email}
@@ -158,10 +169,14 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
               </div>
 
               <div className="form-field">
-                <label className="block text-xs font-medium text-[#6B7A8C] uppercase tracking-wider mb-1.5">
+                <label
+                  htmlFor="contact-company"
+                  className="block text-xs font-medium text-[#6B7A8C] uppercase tracking-wider mb-1.5"
+                >
                   Company
                 </label>
                 <input
+                  id="contact-company"
                   type="text"
                   name="company"
                   value={formData.company}
@@ -172,25 +187,33 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
               </div>
 
               <div className="form-field">
-                <label className="block text-xs font-medium text-[#6B7A8C] uppercase tracking-wider mb-1.5">
+                <label
+                  htmlFor="contact-phone"
+                  className="block text-xs font-medium text-[#6B7A8C] uppercase tracking-wider mb-1.5"
+                >
                   Phone
                 </label>
                 <input
+                  id="contact-phone"
                   type="tel"
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
                   className="w-full px-4 py-3 bg-[#F6F8FB] rounded-lg border border-[rgba(11,28,47,0.08)] text-sm text-[#0B1C2F] placeholder:text-[#6B7A8C]/60 focus:outline-none focus:border-[#1E63AF] focus:ring-1 focus:ring-[#1E63AF] transition-all"
-                  placeholder="+44 (0)20 0000 0000"
+                  placeholder="020 8158 8499"
                 />
               </div>
             </div>
 
             <div className="form-field mb-4 flex-1">
-              <label className="block text-xs font-medium text-[#6B7A8C] uppercase tracking-wider mb-1.5">
+              <label
+                htmlFor="contact-message"
+                className="block text-xs font-medium text-[#6B7A8C] uppercase tracking-wider mb-1.5"
+              >
                 Message
               </label>
               <textarea
+                id="contact-message"
                 name="message"
                 value={formData.message}
                 onChange={handleChange}
@@ -200,31 +223,62 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
               />
             </div>
 
-            <div className="form-field flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pt-4 border-t border-[rgba(11,28,47,0.08)]">
-              <div className="flex items-center gap-4">
+            <div className="form-field flex flex-col gap-4 pt-4 border-t border-[rgba(11,28,47,0.08)]">
+              {submitted && (
+                <div
+                  role="status"
+                  className="rounded-lg bg-[#F6F8FB] border border-[rgba(11,28,47,0.08)] px-4 py-3 text-sm text-[#0B1C2F]"
+                >
+                  Thanks for reaching out. A member of our team will reply shortly.
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                <div className="flex items-center gap-2 text-sm text-[#6B7A8C]">
+                  <Mail className="w-4 h-4" />
+                  info@maandcoaccountants.com
+                </div>
+                <div className="flex items-center gap-2 text-sm text-[#6B7A8C]">
+                  <Phone className="w-4 h-4" />
+                  020 8158 8499
+                </div>
+                <div className="flex items-center gap-2 text-sm text-[#6B7A8C]">
+                  <MessageCircle className="w-4 h-4" />
+                  WhatsApp: 020 3890 1933
+                </div>
+                <div className="flex items-center gap-2 text-sm text-[#6B7A8C]">
+                  <MapPin className="w-4 h-4" />
+                  8 Delamare Crescent, Croydon, CR0 4RU
+                </div>
+                <div className="flex items-center gap-2 text-sm text-[#6B7A8C] lg:col-span-2">
+                  <Clock className="w-4 h-4" />
+                  Mon–Fri 9am–5pm · Sat 10am–2pm · Sun closed
+                </div>
+              </div>
+
+              <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                 <a
-                  href="mailto:hello@maandco.co"
+                  href="mailto:info@maandcoaccountants.com"
                   className="flex items-center gap-2 text-sm text-[#6B7A8C] hover:text-[#1E63AF] transition-colors"
                 >
                   <Mail className="w-4 h-4" />
-                  hello@maandco.co
+                  info@maandcoaccountants.com
                 </a>
                 <a
-                  href="tel:+442000000000"
+                  href="tel:+442081588499"
                   className="flex items-center gap-2 text-sm text-[#6B7A8C] hover:text-[#1E63AF] transition-colors"
                 >
                   <Phone className="w-4 h-4" />
-                  +44 (0)20 0000 0000
+                  +44 (0)20 8158 8499
                 </a>
+                <button
+                  type="submit"
+                  className="flex items-center gap-2 px-6 py-3 bg-[#1E63AF] text-white text-sm font-medium rounded-lg hover:bg-[#1854a0] transition-colors"
+                >
+                  <Send className="w-4 h-4" />
+                  Request a consultation
+                </button>
               </div>
-
-              <button
-                type="submit"
-                className="flex items-center gap-2 px-6 py-3 bg-[#1E63AF] text-white text-sm font-medium rounded-lg hover:bg-[#1854a0] transition-colors"
-              >
-                <Send className="w-4 h-4" />
-                Request a call
-              </button>
             </div>
           </form>
         </div>

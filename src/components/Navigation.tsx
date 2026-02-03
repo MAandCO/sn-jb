@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Menu, X } from 'lucide-react';
+import { useReducedMotion } from '../hooks/use-reduced-motion';
 
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -14,10 +16,20 @@ export default function Navigation() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : '';
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
+
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      element.scrollIntoView({
+        behavior: prefersReducedMotion ? 'auto' : 'smooth',
+      });
     }
     setIsMobileMenuOpen(false);
   };
@@ -51,24 +63,38 @@ export default function Navigation() {
           <div className="hidden md:flex items-center gap-8">
             <button
               onClick={() => scrollToSection('services')}
+              type="button"
               className="text-sm font-medium text-[#0B1C2F] hover:text-[#1E63AF] transition-colors"
             >
               Services
             </button>
             <button
-              onClick={() => scrollToSection('compliance')}
+              onClick={() => scrollToSection('industries')}
+              type="button"
               className="text-sm font-medium text-[#0B1C2F] hover:text-[#1E63AF] transition-colors"
             >
-              Insights
+              Industries
+            </button>
+            <button
+              onClick={() => scrollToSection('resources')}
+              type="button"
+              className="text-sm font-medium text-[#0B1C2F] hover:text-[#1E63AF] transition-colors"
+            >
+              Resources
+            </button>
+            <button
+              onClick={() => scrollToSection('about')}
+              type="button"
+              className="text-sm font-medium text-[#0B1C2F] hover:text-[#1E63AF] transition-colors"
+            >
+              About
             </button>
             <button
               onClick={() => scrollToSection('contact')}
-              className="text-sm font-medium text-[#0B1C2F] hover:text-[#1E63AF] transition-colors"
+              type="button"
+              className="px-4 py-2 text-sm font-medium border border-[rgba(11,28,47,0.15)] rounded-lg hover:bg-[#0B1C2F] hover:text-white transition-all"
             >
-              Contact
-            </button>
-            <button className="px-4 py-2 text-sm font-medium border border-[rgba(11,28,47,0.15)] rounded-lg hover:bg-[#0B1C2F] hover:text-white transition-all">
-              Client login
+              Book a consultation
             </button>
           </div>
 
@@ -76,6 +102,10 @@ export default function Navigation() {
           <button
             className="md:hidden p-2"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            type="button"
+            aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-menu"
           >
             {isMobileMenuOpen ? (
               <X className="w-6 h-6 text-[#0B1C2F]" />
@@ -88,28 +118,47 @@ export default function Navigation() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-[99] bg-white pt-[72px] md:hidden">
+        <div
+          id="mobile-menu"
+          className="fixed inset-0 z-[99] bg-white pt-[72px] md:hidden"
+          role="dialog"
+          aria-modal="true"
+        >
           <div className="flex flex-col items-center gap-8 pt-12">
             <button
               onClick={() => scrollToSection('services')}
+              type="button"
               className="text-lg font-medium text-[#0B1C2F]"
             >
               Services
             </button>
             <button
-              onClick={() => scrollToSection('compliance')}
+              onClick={() => scrollToSection('industries')}
+              type="button"
               className="text-lg font-medium text-[#0B1C2F]"
             >
-              Insights
+              Industries
+            </button>
+            <button
+              onClick={() => scrollToSection('resources')}
+              type="button"
+              className="text-lg font-medium text-[#0B1C2F]"
+            >
+              Resources
+            </button>
+            <button
+              onClick={() => scrollToSection('about')}
+              type="button"
+              className="text-lg font-medium text-[#0B1C2F]"
+            >
+              About
             </button>
             <button
               onClick={() => scrollToSection('contact')}
-              className="text-lg font-medium text-[#0B1C2F]"
+              type="button"
+              className="px-6 py-3 text-sm font-medium border border-[rgba(11,28,47,0.15)] rounded-lg"
             >
-              Contact
-            </button>
-            <button className="px-6 py-3 text-sm font-medium border border-[rgba(11,28,47,0.15)] rounded-lg">
-              Client login
+              Book a consultation
             </button>
           </div>
         </div>

@@ -2,6 +2,7 @@ import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Users, Shield, Layers, FileSearch } from 'lucide-react';
+import { useReducedMotion } from '../hooks/use-reduced-motion';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -15,8 +16,10 @@ export default function SingaporeSection({ className = '' }: SingaporeSectionPro
   const contentRef = useRef<HTMLDivElement>(null);
   const tilesRef = useRef<HTMLDivElement>(null);
   const nodeGraphicRef = useRef<SVGSVGElement>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   useLayoutEffect(() => {
+    if (prefersReducedMotion) return;
     const section = sectionRef.current;
     if (!section) return;
 
@@ -82,7 +85,7 @@ export default function SingaporeSection({ className = '' }: SingaporeSectionPro
     }, section);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
 
   const features = [
     { icon: Users, label: 'Company secretary' },
@@ -106,6 +109,10 @@ export default function SingaporeSection({ className = '' }: SingaporeSectionPro
           <img
             src="/singapore_marina.jpg"
             alt="Singapore Marina Bay"
+            loading="lazy"
+            decoding="async"
+            width={900}
+            height={1200}
             className="w-full h-full object-cover"
           />
         </div>
@@ -177,7 +184,7 @@ export default function SingaporeSection({ className = '' }: SingaporeSectionPro
               Singapore Corporate Advisory
             </h2>
 
-            <p className="text-sm lg:text-base text-[#6B7A8C] leading-relaxed max-w-[34vw] mb-6 lg:mb-8">
+            <p className="text-sm lg:text-base text-[#6B7A8C] leading-relaxed max-w-full lg:max-w-[34vw] mb-6 lg:mb-8">
               Governance, structuring, and statutory support—designed for funds,
               startups, and regional HQs.
             </p>
